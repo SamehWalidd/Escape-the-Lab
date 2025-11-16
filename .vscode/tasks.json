@@ -1,0 +1,33 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "Build GLUT project",
+            "command": "C:\\msys64\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-IC:/vcpkg/installed/x64-windows/include",
+                "-LC:/vcpkg/installed/x64-windows/lib",
+                "-lfreeglut",
+                "-lopengl32",
+                "-lglu32",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Task for building FreeGLUT projects."
+        }
+    ]
+}
