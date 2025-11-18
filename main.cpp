@@ -122,21 +122,95 @@ void drawGame() {
     glLoadIdentity();
 
 
-    gluLookAt(playerX+2, 3, playerZ+4,  playerX, 1, playerZ,  0,1,0);
+    gluLookAt(playerX, 3, playerZ - 5,  playerX, 1, playerZ,  0, 1, 0);
 
     
     glColor3f(0.3f, 0.3f, 0.3f);
+    // Floor
     glBegin(GL_QUADS);
-    glVertex3f(-10, 0, -10);
-    glVertex3f( 10, 0, -10);
-    glVertex3f( 10, 0,  10);
-    glVertex3f(-10, 0,  10);
+    glVertex3f(-5, 0, -5);
+    glVertex3f( 5, 0, -5);
+    glVertex3f( 5, 0,  5);
+    glVertex3f(-5, 0,  5);
+    glEnd();
+
+    // Ceiling
+    glColor3f(0.4f, 0.4f, 0.4f);
+    glBegin(GL_QUADS);
+    glVertex3f(-5, 4, -5);
+    glVertex3f( 5, 4, -5);
+    glVertex3f( 5, 4,  5);
+    glVertex3f(-5, 4,  5);
+    glEnd();
+
+    // Back wall
+    glColor3f(0.5f, 0.5f, 0.5f);
+    glBegin(GL_QUADS);
+    glVertex3f(-5, 0, -5);
+    glVertex3f( 5, 0, -5);
+    glVertex3f( 5, 4, -5);
+    glVertex3f(-5, 4, -5);
+    glEnd();
+
+    // Front wall with door opening
+    // Left section
+    glBegin(GL_QUADS);
+    glVertex3f(-5, 0, 5);
+    glVertex3f(-1, 0, 5);
+    glVertex3f(-1, 4, 5);
+    glVertex3f(-5, 4, 5);
+    glEnd();
+    
+    // Right section
+    glBegin(GL_QUADS);
+    glVertex3f(1, 0, 5);
+    glVertex3f(5, 0, 5);
+    glVertex3f(5, 4, 5);
+    glVertex3f(1, 4, 5);
+    glEnd();
+    
+    // Top section above door
+    glBegin(GL_QUADS);
+    glVertex3f(-1, 2, 5);
+    glVertex3f(1, 2, 5);
+    glVertex3f(1, 4, 5);
+    glVertex3f(-1, 4, 5);
+    glEnd();
+
+    //door
+    glColor3f(0.6f, 0.3f, 0.0f);
+    glBegin(GL_QUADS);
+    glVertex3f(-1, 2, 5);
+    glVertex3f(1, 2, 5);
+    glVertex3f(1, 0, 5);
+    glVertex3f(-1, 0, 5);
+    glEnd();
+    
+
+    // Left wall
+    glColor3f(0.45f, 0.45f, 0.45f);
+    glBegin(GL_QUADS);
+    glVertex3f(-5, 0, -5);
+    glVertex3f(-5, 0,  5);
+    glVertex3f(-5, 4,  5);
+    glVertex3f(-5, 4, -5);
+    glEnd();
+
+    // Right wall
+    glBegin(GL_QUADS);
+    glVertex3f(5, 0, -5);
+    glVertex3f(5, 0,  5);
+    glVertex3f(5, 4,  5);
+    glVertex3f(5, 4, -5);
     glEnd();
 
     drawPlayer();
 }
 
 
+void opendoor(){
+    
+}
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -158,10 +232,10 @@ void keyboard(unsigned char key, int x, int y) {
     }
 
     if (currentState == GAME) {
-        if (key == 'w') playerZ -= speed;
-        if (key == 's') playerZ += speed;
-        if (key == 'a') playerX -= speed;
-        if (key == 'd') playerX += speed;
+        if (key == 'w') playerZ += speed;
+        if (key == 's') playerZ -= speed;
+        if (key == 'a') playerX += speed;
+        if (key == 'd') playerX -= speed;
         if (key == 'm') currentState = MENU;
     }
 }
