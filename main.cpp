@@ -10,6 +10,10 @@
 #include <cstdlib>
 #include <ctime>
 #include <cstdio>
+#ifdef _WIN32
+#include <windows.h>
+#include <mmsystem.h>
+#endif
 using namespace std;
 
 enum GameState { MENU, DARK_HUNT, LASER_CORRIDOR };
@@ -485,7 +489,8 @@ void drawHorizontalWallPattern(float x1, float x2, float z, float wallThickness)
     glColor3f(0.0f, 0.8f, 1.0f);
     glLineWidth(1.0f);
 
-    float zFront = z + wallThickness + 0.001f;
+    float zFront = z + wallThickness + 0.001f; //on the wall
+
     for (float x = minX; x <= maxX; x += 0.5f) {
         glBegin(GL_LINES);
         glVertex3f(x, 0.0f, zFront);
@@ -499,7 +504,7 @@ void drawHorizontalWallPattern(float x1, float x2, float z, float wallThickness)
         glEnd();
     }
 
-    float zBack = z - wallThickness - 0.001f;
+    float zBack = z - wallThickness - 0.001f; // behind the wall
     for (float x = minX; x <= maxX; x += 0.5f) {
         glBegin(GL_LINES);
         glVertex3f(x, 0.0f, zBack);
@@ -646,6 +651,7 @@ void drawMazeRoom() {
     float camY = 3.0f + 3.0f * sin(cameraPitch * 3.14159f / 180.0f);
     float camZ = playerZ + 3.0f * cos(cameraYaw * 3.14159f / 180.0f);
     
+
     if (camX < -10.0f) camX = -10.0f;
     if (camX > 10.0f) camX = 10.0f;
     if (camZ < 0.0f) camZ = 0.0f;
@@ -1012,7 +1018,7 @@ void drawLaserCorridor() {
     float camX = playerX + 3.0f * sin(cameraYaw * 3.14159f / 180.0f);
     float camY = 3.0f + 3.0f * sin(cameraPitch * 3.14159f / 180.0f);
     float camZ = playerZ + 3.0f * cos(cameraYaw * 3.14159f / 180.0f);
-    
+
     if (camX < -4.0f) camX = -4.0f;
     if (camX > 4.0f) camX = 4.0f;
     if (camZ < 0.0f) camZ = 0.0f;
@@ -1023,7 +1029,8 @@ void drawLaserCorridor() {
     gluLookAt(camX, camY, camZ, playerX, 1, playerZ, 0, 1, 0);
 
     glColor3f(0.04f, 0.05f, 0.08f); // Dark blue
-    glBegin(GL_QUADS);
+    //Floor
+    glBegin(GL_QUADS); 
     glVertex3f(-4, 0, 0);
     glVertex3f( 4, 0, 0);
     glVertex3f( 4, 0, 20);
@@ -1044,6 +1051,7 @@ void drawLaserCorridor() {
         glEnd();
     }
 
+    //front wall
     glColor3f(0.12f, 0.14f, 0.20f); // Dark blue
     glBegin(GL_QUADS);
     glVertex3f(-4, 4, 0);
@@ -1052,6 +1060,7 @@ void drawLaserCorridor() {
     glVertex3f(-4, 4, 20);
     glEnd();
 
+    //back wall
     glColor3f(0.10f, 0.12f, 0.18f); // Blue-gray
     glBegin(GL_QUADS);
     glVertex3f(-4, 0, 0);
@@ -1061,6 +1070,7 @@ void drawLaserCorridor() {
     glEnd();
     drawHorizontalWallPattern(-4.0f, 4.0f, 0.0f, 0.0f);
 
+    //side wall
     glColor3f(0.10f, 0.12f, 0.18f);
     glBegin(GL_QUADS);
     glVertex3f(-4, 0, 20);
@@ -1090,6 +1100,7 @@ void drawLaserCorridor() {
 
     laserTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
 
+    //vertical lasers
     for (int i = 0; i < 3; i++) {
         float laserZ = 4.0f + (i * 6.0f);
         float laserX = sin(laserTime * 0.5f) * 3.5f;
@@ -1110,6 +1121,7 @@ void drawLaserCorridor() {
     }
     glLineWidth(1.0f);
 
+    //horiztonal lasers
     for (int i = 0; i < 3; i++) {
         float laserZ = 7.0f + (i * 6.0f);
         float cycle = fmod(laserTime, 2.0f);
@@ -1137,6 +1149,7 @@ void drawLaserCorridor() {
 
     drawPlayer();
 
+    //2d menu
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -1249,7 +1262,7 @@ void drawLaserCorridor() {
         
         glColor3f(1.0f, 1.0f, 1.0f); // White
         drawText(295, 105, "PRESS SPACE TO START");
-        } else {
+        } else { 
 
         float elapsedTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f - levelStartTime;
         float remainingTime = LEVEL_TIME_LIMIT - elapsedTime;
@@ -1315,6 +1328,7 @@ void drawLaserCorridor() {
         }
     }
     
+    //return to 3d 
     glEnable(GL_DEPTH_TEST);
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
@@ -1326,7 +1340,7 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (currentState == LASER_CORRIDOR && levelStarted) {
-        float currentTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+        float currentTime = glutGet(GLUT_ELAPSED_TIME) / 1000.0f; //s
         updateHeatZones(currentTime);
         
         static int debugCounter = 0;
@@ -1346,6 +1360,7 @@ void display() {
             int zoneHit = checkHeatZoneCollision(playerX, playerZ);
             if (zoneHit > 0) {
                 printf("HIT ZONE %d! Score: %d -> %d\n", zoneHit, playerScore, playerScore + 1);
+                PlaySound(TEXT("sounds\\tiles.wav"), NULL, SND_FILENAME | SND_ASYNC);
                 playerScore++;
                 lastScoreTime = currentTime;
                 scored = true;
@@ -1353,9 +1368,11 @@ void display() {
             
             if (!scored && checkLaserCollision(playerX, 1.0f, playerZ)) {
                 printf("HIT LASER! Score: %d -> %d\n", playerScore, playerScore - 1);
+                PlaySound(TEXT("sounds\\laser.wav"), NULL, SND_FILENAME | SND_ASYNC);
                 playerScore--;
                 if (playerScore < 0) playerScore = 0;
                 lastScoreTime = currentTime;
+                
             }
         }
     }
@@ -1379,9 +1396,11 @@ void keyboard(unsigned char key, int x, int y) {
             playerZ = 0.5f;
             cameraYaw = 0.0f;
             cameraPitch = 0.0f;
+
             mouseLocked = true;
             glutSetCursor(GLUT_CURSOR_NONE);
             glutWarpPointer(400, 300);
+
             mazeRoomLoaded = false;
             mazeStarted = false;
             for (int i = 0; i < NUM_MARKERS; i++) {
@@ -1399,8 +1418,8 @@ void keyboard(unsigned char key, int x, int y) {
 
         float moveX = sin(cameraYaw * 3.14159f / 180.0f);
         float moveZ = cos(cameraYaw * 3.14159f / 180.0f);
-        float strafeX = cos(cameraYaw * 3.14159f / 180.0f);
-        float strafeZ = -sin(cameraYaw * 3.14159f / 180.0f);
+        float strafeX = cos(cameraYaw * 3.14159f / 180.0f); //left-right
+        float strafeZ = -sin(cameraYaw * 3.14159f / 180.0f); //forward-backward
         
         if (key == 's') {
             newX = playerX + moveX * speed;
@@ -1458,6 +1477,7 @@ void keyboard(unsigned char key, int x, int y) {
 
                     if (dist < 0.7f) {
                         markers[currentMarker].active = true;
+                        PlaySound(TEXT("sounds\\coins.wav"), NULL, SND_FILENAME | SND_ASYNC);
                         currentMarker++;
                     }
                 }
